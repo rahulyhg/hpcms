@@ -5,21 +5,25 @@ use Hunter\Core\Category\Tree;
 /**
  * 根据parentid取所有子类.
  */
-function get_subcats_byid($pid = 0, $sub = true, $reset = false) {
-  $cats = db_select('category', 'c')
+function get_subcats_byid($pid = 0, $sub = true, $reset = false, $showall = false) {
+  $query = db_select('category', 'c')
     ->fields('c')
     ->condition('parentid', $pid)
     ->orderBy('c.weight', 'ASC')
-    ->groupBy('c.cid')
-    ->execute()
-    ->fetchAllAssoc('cid');
+    ->groupBy('c.cid');
+
+  if(!$showall){
+    $query->condition('status', 'yes');
+  }
+
+  $cats = $query->execute()->fetchAllAssoc('cid');
 
   if($sub){
     foreach ($cats as $key => $cat) {
       if(!$reset){
-        $cats[$key]->sub = get_subcats_byid($cat->cid, true, false);
+        $cats[$key]->sub = get_subcats_byid($cat->cid, true, false, $showall);
       }else {
-        $cats += get_subcats_byid($cat->cid, true, true);
+        $cats += get_subcats_byid($cat->cid, true, true, $showall);
       }
     }
   }
@@ -216,6 +220,7 @@ function get_sub_promoted_cats_byid($pid = 0, $sub = true, $reset = false) {
     ->fields('c')
     ->condition('parentid', $pid)
     ->condition('promoted', 1)
+    ->condition('status', 'yes')
     ->groupBy('c.cid')
     ->execute()
     ->fetchAllAssoc('cid');

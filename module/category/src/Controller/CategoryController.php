@@ -20,7 +20,7 @@ class CategoryController {
    */
   public function category_list(Tree $tree) {
     $cats_list = '';
-    $category_list = get_subcats_byid(0, true, true);
+    $category_list = get_subcats_byid(0, true, true, true);
 
     $str = "<tr>
       <td>\$a->cid</td>
@@ -59,7 +59,7 @@ class CategoryController {
           'cover' => $parms['cover'],
           'description' => $parms['description'],
           'link' => $parms['link'],
-          'status' => isset($parms['status']) ? $parms['status'] : '',
+          'status' => isset($parms['status']) ? $parms['status'] : 'no',
           'weight' => $parms['weight']
         ))
         ->execute();
@@ -243,7 +243,7 @@ class CategoryController {
          'cover' => $parms['cover'],
          'description' => $parms['description'],
          'link' => $parms['link'],
-         'status' => $parms['status'],
+         'status' => isset($parms['status']) ? $parms['status'] : 'no',
          'weight' => $parms['weight']
        ))
        ->condition('cid', $parms['cid'])
