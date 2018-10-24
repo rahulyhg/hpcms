@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理首页</title>
+<base href="{{ base_path() }}">
+<link rel="stylesheet" href="theme/admin/assets/layui/css/layui.css">
+<link rel="stylesheet" href="theme/admin/assets/css/style.css">
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">
+      <a class="logo" href="<?php echo base_path(); ?>"><img src="theme/admin/assets/logo.png" alt="HunterPHP"></a>
+    </div>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="{{ $user['avatar'] }}" class="layui-nav-img">
+          {{ $user['nickname'] ? $user['nickname'] : $user['nickname'] }}
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a href="admin/logout">安全退出</a></li>
+    </ul>
+  </div>
+
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree left-menu" lay-filter="left-menu">
+        <li class="layui-nav-item layui-nav-itemed">
+          <a class="" href="javascript:;">管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" data-url="admin/category/list" data-id="1">分类管理</a></dd>
+            <dd><a href="javascript:;" data-url="admin/page/list" data-id="4">单页管理</a></dd>
+            <dd><a href="javascript:;" data-url="admin/news/list" data-id="5">新闻管理</a></dd>
+            <dd><a href="javascript:;" data-url="admin/views" data-id="6">视图管理</a></dd>
+            <dd><a href="javascript:;" data-url="admin/user/list" data-id="3">用户管理</a></dd>
+            <dd><a href="javascript:;" data-url="admin/role/list" data-id="2">角色管理</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">设置</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" data-id="7">网站配置</a></dd>
+            <dd><a href="javascript:;" data-id="8">用户设置</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="layui-body" style="padding: 5px 15px;">
+    <!-- 内容主体区域 -->
+    @yield('main-content')
+  </div>
+
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © hunterphp.com - 宇内最叼的PHP框架!
+  </div>
+</div>
+
+<script src="theme/admin/assets/layui/layui.js"></script>
+<script src="theme/admin/assets/js/admin.js"></script>
+</body>
+</html>

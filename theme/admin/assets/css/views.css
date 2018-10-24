@@ -1,0 +1,319 @@
+/* reset */
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+input,textarea,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+article, aside, figure, footer, header,hgroup, menu, nav, section, menu,
+time, mark, audio, video {
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    background:transparent;
+}
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,dl,dt,dd,ol,nav ul,nav li,fieldset,form,label,legend,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;}
+article, aside, details, figcaption, figure,footer, header, hgroup, menu, nav, section {display: block;}
+ol,ul{list-style:none;margin:0;padding:0;}
+blockquote,q{quotes:none;}
+blockquote:before,blockquote:after,q:before,q:after{content:'';content:none;}
+table{border-collapse:collapse;border-spacing:0;}
+
+* {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.header {
+  color: #ffffff;
+  font-family: Tahoma;
+  font-size: 16px;
+  background-color: #363636;
+  padding: 5px 0px 5px 20px;
+}
+
+.view-config, .side-right {
+  display: inline-block;
+  width: 49%;
+  height: 100%;
+  vertical-align: top;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.side-right {
+  border-left: 1px solid #ccc;
+}
+
+.preview-result {
+  resize: none;
+  outline: none;
+  font-size: 14px;
+  min-height: 800px;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+
+.preview-result h2 {
+  background-color: #e1e2dc;
+  border-bottom: 1px solid #ccc;
+  margin-top: 0;
+  padding: 8px 12px;
+}
+
+.preview-result .views-live-preview {
+  padding: 20px;
+}
+
+.preview-result .views_expose_form button {
+  margin-top: 10px;
+}
+
+.view-config {
+  margin:0 auto;
+  padding: 10px 12px 10px 20px;
+  font: 13px "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+.view-config .form-item {
+  padding: 0;
+  display: block;
+  list-style: none;
+  margin: 10px 0 0 0;
+}
+.view-config #view_table, .view-config #view_relation {
+  display: inline-block;
+  vertical-align: middle;
+}
+.view-config label{
+  margin:0 0 3px 0;
+  padding:0px;
+  display:block;
+  font-weight: bold;
+}
+.view-config .form-item button {
+  margin-right: 5px;
+}
+.view-config .input-inline-block {
+  display: inline-block;
+  margin-right: 10px;
+}
+.view-config .input-block ul {
+  width: 100%;
+}
+.view-config .input-block li {
+  display: inline-block;
+  width: 30%;
+}
+.view-config input[type=text],
+.view-config input[type=date],
+.view-config input[type=datetime],
+.view-config input[type=number],
+.view-config input[type=search],
+.view-config input[type=time],
+.view-config input[type=url],
+.view-config input[type=email],
+select,
+.side-right input {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border:1px solid #BEBEBE;
+    padding: 7px;
+    margin:0px;
+    -webkit-transition: all 0.30s ease-in-out;
+    -moz-transition: all 0.30s ease-in-out;
+    -ms-transition: all 0.30s ease-in-out;
+    -o-transition: all 0.30s ease-in-out;
+    outline: none;
+}
+.view-config input[type=text]:focus,
+.view-config input[type=date]:focus,
+.view-config input[type=datetime]:focus,
+.view-config input[type=number]:focus,
+.view-config input[type=search]:focus,
+.view-config input[type=time]:focus,
+.view-config input[type=url]:focus,
+.view-config input[type=email]:focus,
+.view-config select:focus{
+    -moz-box-shadow: 0 0 8px #78A15A;
+    -webkit-box-shadow: 0 0 8px #78A15A;
+    box-shadow: 0 0 8px #78A15A;
+    border: 1px solid #78A15A;
+}
+.view-config .field-divided{
+    width: 49%;
+}
+
+.view-config .field-long{
+    width: 100%;
+}
+.view-config .field-select{
+    width: 100%;
+}
+.view-config .field-textarea{
+    height: 100px;
+}
+.view-config input[type=submit], .view-config input[type=button]{
+    background: #4B99AD;
+    padding: 8px 15px 8px 15px;
+    border: none;
+    color: #fff;
+}
+.view-config input[type=submit]:hover, .view-config input[type=button]:hover{
+    background: #4691A4;
+    box-shadow:none;
+    -moz-box-shadow:none;
+    -webkit-box-shadow:none;
+}
+.view-config .required{
+    color:red;
+}
+
+.view-config .vx-stage-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  vertical-align: top;
+  border: none;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  padding: 15px 0 0 15px;
+}
+
+.view-config .vx-stage-north {
+  position: absolute;
+  background-image: url(../images/stage-north.png);
+  height: 10px;
+  background-repeat: repeat-x;
+  width: 99%;
+  top: 0px;
+  left: 10px;
+}
+
+.view-config .vx-stage-west {
+  position: absolute;
+  background-image: url(../images/stage-west.png);
+  width: 10px;
+  background-repeat: repeat-y;
+  height: 98%;
+  top: 10px;
+  left: 0px;
+}
+
+.view-config .machine_name {
+  width: 100%;
+}
+
+.view-config .description-textarea {
+  min-height: 50px;
+  height: auto;
+  padding: 6px 10px;
+  resize: vertical;
+  border: 1px solid #BEBEBE;
+  display: block;
+  width: 100%;
+}
+
+.view-config .template-textarea {
+  width: 100%;
+  height: 100%;
+  font-size: 12px;
+  line-height: 25px;
+  background-image: url(../images/line-bg.png);
+}
+
+.preview-result table {
+  width: 100%;
+  margin: 10px 0;
+  background-color: #fff;
+}
+
+.preview-result table thead tr {
+  background-color: #f2f2f2;
+}
+
+.preview-result table td, .preview-result table th {
+  border: 1px solid #e2e2e2;
+}
+
+.preview-result table td,
+.preview-result table th {
+  position: relative;
+  padding: 9px 15px;
+  min-height: 20px;
+  line-height: 20px;
+  font-size: 14px;
+}
+.dataintable {
+  width: 100%;
+}
+.dataintable thead tr {
+  background-color: #f2f2f2;
+}
+.dataintable th,
+.dataintable td {
+  position: relative;
+  padding: 9px 15px;
+  min-height: 10px;
+  line-height: 10px;
+  font-size: 14px;
+  border: 1px solid #e2e2e2;
+}
+.dataintable td input {
+  display: inline-block;
+  vertical-align: middle;
+}
+.dataintable .sortdate span {
+  display: inline-block;
+  vertical-align: middle;
+  width: 45%;
+  line-height: 20px;
+}
+.view_filters_list, .view_sort_list {
+  border: 1px solid #f3f3f3;
+  line-height: 20px;
+  margin: 10px 0;
+}
+.view_filters_list li, .view_sort_list li {
+  padding: 5px 1px 5px;
+  color: #666;
+  font-size: 12px;
+  cursor: move;
+  cursor: -webkit-grabbing;
+}
+.view_filters_list li.even, .view_sort_list li.even {
+  background-color: #f3f5ee;
+}
+.view_filters_list li span, .view_sort_list li span {
+  display: inline-block;
+  cursor: pointer;
+  color: #0074bd;
+}
+.view_filters_list li .btn, .view_sort_list li .btn {
+  float: right;
+}
+.context-filter {
+  margin: 15px 0;
+}
+.context-filter input {
+  width: 90%;
+}
+.pagination li {
+  display: inline-block;
+  padding: 3px 6px;
+  border: 1px solid #15ADBC;
+  margin-left: 5px;
+}
+.pagination li a {
+  color: #333;
+  text-decoration: none;
+}
+.preview-note {
+  padding-top: 15px;
+  color: #666;
+}

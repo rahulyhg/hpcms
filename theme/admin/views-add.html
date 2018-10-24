@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Views Add</title>
+  <base href="{{ base_path() }}">
+  <link rel="stylesheet" href="theme/admin/assets/css/views.css">
+  <link rel="stylesheet" href="theme/admin/assets/css/jquery.dropdown.css">
+  <script src="theme/admin/assets/js/jquery.min.js"></script>
+  <script src="theme/admin/assets/js/layer/layer.js"></script>
+  <script src="theme/admin/assets/js/vue.min.js"></script>
+  <script src="theme/admin/assets/js/vue-resource.js"></script>
+  <script src="theme/admin/assets/js/lodash.min.js"></script>
+  <script src="theme/admin/assets/js/jquery.dropdown.js"></script>
+  <script src="theme/admin/assets/js/sortable.min.js"></script>
+  <script src="theme/admin/assets/js/vuedraggable.min.js"></script>
+  @if(isset($phptojs))
+  {!! $phptojs->getJsVars() !!}
+  @endif
+</head>
+<body>
+  <div class="header">
+		<div class="header_nav">HunterPHP 终极核武器 Views</div>
+	</div>
+  <div id="App">
+    <form class="view-config" action="#">
+      <div class="form-item">
+        <label class="form-label">名称</label>
+        <div class="input-inline-block">
+          <input type="text" name="view_name" v-model="view_name">
+          <span class="machine_name" v-show="view_name != '' && !edit_machine_name">机器名: @{{ view_machine_name }} [<a href="#" @click.prevent.prevent="editMachineName">编辑</a>]</span>
+        </div>
+      </div>
+
+      <div class="form-item" v-show="view_name != '' && edit_machine_name">
+        <label class="form-label">机器名</label>
+        <div class="input-block">
+          <input type="text" class="machine_name" name="view_machine_name" :value="view_machine_name">
+        </div>
+      </div>
+
+      <div class="form-item">
+        <label class="form-label">标题</label>
+        <div class="input-block">
+          <input type="text" class="view_title" name="view_title" v-model="view_title">
+        </div>
+      </div>
+
+      <div class="form-item">
+        <label class="form-label">描述</label>
+        <div class="input-block">
+           <textarea name="view_description" class="description-textarea" v-model="view_description"></textarea>
+        </div>
+      </div>
+
+      <div class="form-item" id="view_table">
+        <label class="form-label">查询</label>
+        <div class="input-inline">
+          <select name="view_table" v-model="view_table" @change="updateField">
+            <option value="">请选择表</option>
+            <option v-for="(table, index) in tables" :value="index">@{{ index }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-item" id="view_relation" v-if="relationships.length != 0">
+        <label class="form-label">关联</label>
+        <div class="input-inline">
+          <select name="view_relation" v-model="view_relation_table" @change="addRelationshipFields">
+            <option value="">请选择表</option>
+            <option value="mini_pager" v-for="rtable in relationships" :value="rtable">@{{ rtable }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-item" pane="" v-if="view_table != ''">
+        <label class="form-label">选择字段</label>
+        <div class="input-block" v-if="fields">
+          <ul>
+            <li v-for="(field, key) in fields">
+              <input type="checkbox" :name="'view_fields['+key+']'" :value="key" v-model="view_fields" :title="field.name">@{{ field.name }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="form-item" pane="" v-if="view_table != ''">
+        <label class="form-label">过滤</label>
+        <div class="view_filters_list" v-if="view_filters.length != 0">
+          <ul>
+            <draggable v-model="view_filters" :options="{group:'views_filter_list'}">
+              <li v-for="(filter, key) in view_filters" :class="{'even': key % 2 === 0, 'odd': key % 2 !== 0 }" :key="key">
+                <span @click.prevent="editFilter(filter)">@{{ filter.field }} (@{{ filter.exposed ? 'exposed' : filter.lable +' '+ filter.value }})</span>
+                <button class="btn" @click.prevent="removeFilter(filter)">Remove</button>
+                <button class="btn" @click.prevent="editFilter(filter)">Edit</button>
+              </li>
+            </draggable>
+          </ul>
+        </div>
+        <div class="input-block" v-if="fields">
+          <table class="dataintable">
+            <thead>
+              <tr>
+                <th width="25%">字段</th>
+                <th width="35%">操作符</th>
+                <th width="25%">值</th>
+                <th>操作</th>
+              </tr>
+             </thead>
+             <tbody>
+              <tr>
+                <td class="bsIE">
+                  <select class="form-select" v-model="new_filter_field" @change="updateFilterOp">
+                    <option v-for="(field, key) in fields" v-if="field.filter_type" :value="key">@{{ field.name }}</option>
+                  </select>
+                </td>
+                <td class="bsFirefox">
+                  <select class="form-select" v-model="new_filter_op">
+                    <option v-for="(op, key) in filter_ops" :value="key">@{{ op.title }}</option>
+                  </select>
+                </td>
+                <td class="bsChrome">
+                  <input type="text" name="new_filter_value" v-model="new_filter_value" class="input" v-if="select_field_filter_type != 'yes-no'">
+                  <div v-else>
+                    <input type="radio" name="new_filter_value" value="1" v-model="new_filter_value" checked="checked" class="form-radio">Yes
+                    <input type="radio" name="new_filter_value" value="0" v-model="new_filter_value" class="form-radio">No
+                  </div>
+                </td>
+                <td class="bsChrome">
+                  <button class="btn btn-primary btn-mini" @click.prevent="addNewFilter(new_filter_exposed_setting)" v-if="!edit_filter_mode">添加</button>
+                  <button class="btn btn-primary btn-mini" @click.prevent="doneEditFilter(new_filter_exposed_setting)" v-if="edit_filter_mode">修改</button>
+                  <button class="btn btn-primary btn-mini" @click.prevent="cancelEditFilter" v-if="edit_filter_mode">取消</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="bsIE" colspan="4">
+                  <input type="checkbox" v-model="new_filter_value_from_url">使用Url动态参数<br /><br />
+                  <input type="checkbox" v-model="new_filter_exposed_setting">暴露此字段<br /><br />
+                  <div class="exposed_setting" v-if="new_filter_exposed_setting">
+                    <div class="form-item">
+                      <label class="form-label">标签</label>
+                      <div class="input-inline-block">
+                        <input type="text" name="filter_exposed_lable" v-model="new_filter_exposed_lable">
+                      </div>
+                    </div>
+                    <div class="form-item">
+                      <label class="form-label">描述</label>
+                      <div class="input-inline-block">
+                        <input type="text" name="filter_exposed_description" v-model="new_filter_exposed_description">
+                      </div>
+                    </div>
+                    <div class="form-item">
+                      <label class="form-label">标识符</label>
+                      <div class="input-inline-block">
+                        <input type="text" name="filter_exposed_identifier" v-model="new_filter_exposed_identifier">
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="form-item" pane="" v-if="view_table != ''">
+        <label class="form-label">排序</label>
+        <div class="view_sort_list" v-if="view_sorts.length != 0">
+          <ul>
+            <draggable v-model="view_sorts" :options="{group:'view_sort_list'}">
+              <li v-for="(sort, key) in view_sorts" :class="{'even': key % 2 === 0, 'odd': key % 2 !== 0 }" :key="key">
+                <span @click.prevent="editSort(sort)">@{{ sort.field }} (@{{ sort.exposed ? 'exposed' : sort.value }})</span>
+                <button class="btn" @click.prevent="removeSort(sort)">Remove</button>
+                <button class="btn" @click.prevent="editSort(sort)">Edit</button>
+              </li>
+            </draggable>
+          </ul>
+        </div>
+        <div class="input-block" v-if="fields">
+          <table class="dataintable">
+            <thead>
+              <tr>
+                <th width="25%">字段</th>
+                <th width="35%">排序</th>
+                <th width="25%">选项</th>
+                <th>操作</th>
+              </tr>
+             </thead>
+             <tbody>
+              <tr>
+                <td class="bsIE">
+                  <select class="form-select" v-model="new_sort_field" @change="updateSortType">
+                    <option v-for="(field, key) in fields" :value="key">@{{ field.name }}</option>
+                  </select>
+                </td>
+                <td class="bsFirefox">
+                  <input type="radio" name="new_sort_value" value="asc" v-model="new_sort_value" checked="checked" class="form-radio">ASC
+                  <input type="radio" name="new_sort_value" value="desc" v-model="new_sort_value" class="form-radio">DESC
+                </td>
+                <td class="bsChrome">
+                  <div class="sortdate" v-if="select_field_sort_type == 'date'">
+                    <span><input type="radio" name="new_sort_date" value="second" v-model="new_sort_date" checked="checked" class="form-radio">Second</span>
+                    <span><input type="radio" name="new_sort_date" value="minute" v-model="new_sort_date" class="form-radio">Minute</span>
+                    <span><input type="radio" name="new_sort_date" value="hour" v-model="new_sort_date" class="form-radio">Hour</span>
+                    <span><input type="radio" name="new_sort_date" value="day" v-model="new_sort_date" class="form-radio">Day</span>
+                    <span><input type="radio" name="new_sort_date" value="month" v-model="new_sort_date" class="form-radio">Month</span>
+                    <span><input type="radio" name="new_sort_date" value="year" v-model="new_sort_date" class="form-radio">Year</span>
+                  </div>
+                </td>
+                <td class="bsChrome">
+                  <button class="btn btn-primary btn-mini" @click.prevent="addNewSort(new_sort_exposed_setting)" v-if="!edit_sort_mode">添加</button>
+                  <button class="btn btn-primary btn-mini" @click.prevent="doneEditSort(new_sort_exposed_setting)" v-if="edit_sort_mode">修改</button>
+                  <button class="btn btn-primary btn-mini" @click.prevent="cancelEditSort" v-if="edit_sort_mode">取消</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="bsIE" colspan="4">
+                  <input type="checkbox" v-model="new_sort_exposed_setting">暴露此字段<br /><br />
+                  <div class="exposed_setting" v-if="new_sort_exposed_setting">
+                    <div class="form-item">
+                      <label class="form-label">标签</label>
+                      <div class="input-inline-block">
+                        <input type="text" name="sort_exposed_lable" v-model="new_sort_exposed_lable">
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="form-item" pane="">
+        <input type="checkbox" name="has_pager" title="使用分页" v-model="has_pager">使用分页
+      </div>
+
+      <div class="form-item" v-if="has_pager">
+        <label class="form-label">分页</label>
+        <div class="input-inline">
+          <select name="view_pager[type]" v-model="view_pager.type">
+            <option value="">请选择分页</option>
+            <option value="mini">迷你分页</option>
+            <option value="full">完整分页</option>
+            <option value="display_all">显示所有</option>
+            <option value="display_number">显示部分</option>
+          </select>
+          <input type="text" name="view_pager[display]" v-if="view_pager.type != 'display_all'" v-model="view_pager.display">
+          <input type="text" name="view_pager[offset]" v-model="view_pager.offset">
+        </div>
+      </div>
+
+      <div class="form-item" pane="">
+        <input type="checkbox" name="json_export" title="API输出" v-model="json_export">API输出
+        <div class="input-block">
+          <div><label class="form-label">路径</label></div>
+          <input type="text" name="view_path" v-model="view_path">
+        </div>
+      </div>
+
+      <div class="form-item" pane="">
+        <input type="checkbox" name="need_permission" title="设置权限" v-model="need_permission" @change="scanPermission">设置权限
+        <div class="dropdown-permission-list" v-if="need_permission">
+          <select name="view_permission" multiple placeholder="请选择权限(可多选)"></select>
+        </div>
+      </div>
+
+      <div v-if="!json_export">
+        <div class="form-item" pane="">
+          <div><label class="form-label">格式化</label></div>
+          <button class="btn btn-primary btn-mini" @click.prevent="setTextarea('htmllist')">Html List</button>
+          <button class="btn btn-primary btn-mini" @click.prevent="setTextarea('table')">Table</button>
+          <button class="btn btn-primary btn-mini" @click.prevent="setTextarea('none')">Unformatted list</button>
+          <button class="btn btn-primary btn-mini" @click.prevent="setTextarea('html5')">HTML5</button>
+        </div>
+
+        <div class="form-item" pane="">
+          <div><label class="form-label" v-if="view_fields != ''">可用字段</label></div>
+          <button class="btn btn-primary btn-mini" v-for="field in view_fields">@{{ field }}</button>
+        </div>
+
+        <div><label class="form-label">模板</label></div>
+        <input type="radio" id="create_new_template" value="new" v-model="create_new_template">创建新模板
+        <input type="radio" id="create_new_template" value="exist" v-model="create_new_template">使用现成模板
+        <div class="form-item" v-if="create_new_template == 'exist'">
+          <select name="view_table" v-model="view_template">
+            <option value="">请选择模板</option>
+            <option v-for="(template, index) in templates" :value="template">@{{ index }}</option>
+          </select>
+          <button class="btn btn-primary btn-mini" @click.prevent="cleanLoadTemplates">刷新模板缓存</button>
+          <button class="btn btn-primary btn-mini" @click.prevent="editThisTemplate">编辑该模板</button>
+        </div>
+
+        <div class="form-item form-text" v-if="show_editor">
+          <div><label class="form-label">编辑模板</label></div>
+          <div class="input-block vx-stage-container">
+            <textarea class="template-textarea" rows="15" cols="15" v-model="template_content"></textarea>
+            <div class="vx-stage-north"></div>
+            <div class="vx-stage-west"></div>
+          </div>
+          <div v-if="create_new_template == 'exist'">
+            <input type="checkbox" name="overwrit_template" title="描述" v-model="overwrit_template">覆盖原模板文件
+          </div>
+        </div>
+      </div>
+
+      <div class="form-item">
+        <div class="input-block">
+          <button class="btn" @click.prevent="saveView('final')">保存</button>
+          <button type="reset">重置</button>
+        </div>
+      </div>
+    </form>
+    <div class="side-right">
+      <div class="context-filter">动态参数：<input type="text" v-model="context_filter_value"></div>
+      <button class="btn" @click.prevent="previewResult" :disabled="canPreview">预览</button>
+      <div class="preview-result">
+        <h2>Preview</h2>
+        <div class="views-live-preview">
+          <pre v-if="json_export" v-html="preview_result"></pre>
+          <div v-html="preview_result" v-else></div>
+          <div class="show-query-sql"></div>
+        </div>
+      </div>
+      <div class="preview-note">注：本预览只作为临时效果预览, 分页、样式等效果请在最终调用页面查看.</div>
+    </div>
+  </div>
+  <script src="theme/admin/assets/js/app.min.js"></script>
+</body>
+</html>

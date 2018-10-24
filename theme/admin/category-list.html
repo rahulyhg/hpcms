@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>栏目列表</title>
+    <base href="{{ base_path() }}">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <link rel="stylesheet" href="theme/admin/assets/layui/css/layui.css">
+    <link rel="stylesheet" href="theme/admin/assets/css/style.css">
+</head>
+
+<body>
+    <div class="tab-body">
+        <div class="handle-box">
+            <ul>
+                <li class="handle-item"><a href="javascript:;" onclick="categoryAdd();" class="layui-btn btn-add btn-default" id="btn-addcategory"><i class="linyer icon-add"></i> 添加栏目</a></li>
+            </ul>
+        </div>
+        <table class="layui-table" id="userTable">
+            <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>名称</th>
+                  <th>链接</th>
+                  <th>权重排序</th>
+                  <th>启用</th>
+                  <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {!! $cats_list !!}
+            </tbody>
+        </table>
+        <input id="iframe_status" value="" hidden="hidden">
+    </div>
+    <script src="theme/admin/assets/layui/layui.js"></script>
+    <script>
+        function categoryAdd(cid) {
+            layui.use(['layer'], function() {
+                var $ = layui.jquery;
+                var layer = layui.layer;
+
+                var index = layer.open({
+                    title: '新建栏目',
+                    type: 2,
+                    area: ['800px', '590px'],
+                    fix: false, //不固定
+                    maxmin: true,
+                    content: "admin/category/add?cid=" + cid,
+                    success: function(layero, index) {},
+                    end: function() {
+                        var iframe_status = $("#iframe_status").val();
+                        if (iframe_status == '1') {
+                            layer.msg('新建成功！', {
+                                icon: 1,
+                                time: 1000,
+                                shade: 0.1
+                            }, function() {
+                                location.reload();
+                            });
+                        } else if (iframe_status == '0') {
+                            layer.msg('新建失败!', {
+                                icon: 5
+                            });
+                        }
+                    }
+                });
+                layer.full(index);
+            });
+        }
+
+
+        function categoryEdit(cid) {
+            layui.use(['layer'], function() {
+                var $ = layui.jquery;
+                var layer = layui.layer;
+
+                var index = layer.open({
+                    title: '栏目编辑',
+                    type: 2,
+                    area: ['800px', '590px'],
+                    fix: false, //不固定
+                    maxmin: true,
+                    content: "admin/category/edit/" + cid,
+                    success: function(layero, index) {},
+                    end: function() {
+                        var iframe_status = $("#iframe_status").val();
+                        if (iframe_status == '1') {
+                            layer.msg('编辑成功！', {
+                                icon: 1,
+                                time: 1000,
+                                shade: 0.1
+                            }, function() {
+                                location.reload();
+                            });
+                        } else if (iframe_status == '0') {
+                            layer.msg('没有编辑内容', {
+                                icon: 5
+                            });
+                        } else if (iframe_status == '') {}
+                    }
+                });
+                layer.full(index);
+            });
+        }
+
+        function categoryDel(cid) {
+            layui.use(['layer'], function() {
+                var $ = layui.jquery;
+                var layer = layui.layer;
+
+                layer.confirm('确定删除此栏目?', {
+                    icon: 3,
+                    title: '栏目删除'
+                }, function(index) {
+                    $.ajax({
+                        type: "GET",
+                        url: "admin/category/del/" + cid,
+                        success: function(msg) {
+                            if (msg) { //如果成功了
+                                layer.msg('删除成功', {
+                                    icon: 1,
+                                    time: 1000,
+                                    shade: 0.1
+                                }, function() {
+                                    location.reload();
+                                });
+                            } else {
+                                layer.msg('删除失败', {
+                                    icon: 5
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
