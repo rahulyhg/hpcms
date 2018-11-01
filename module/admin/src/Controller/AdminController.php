@@ -31,21 +31,25 @@ class AdminController {
         $user = get_user_byname($parms['username']);
 
         if($user){
-          if (hunter_password_verify($parms['password'], $user->password)) {
-            db_update('user')
-              ->fields(array(
-                'accessed' => time(),
-              ))
-              ->condition('uid', $user->uid)
-              ->execute();
-            session()->set('admin', $user);
-            session()->set('curuser', $user);
-            return new JsonResponse(array('code' => 0, 'msg' => '登录成功'));
-          } else {
-            return new JsonResponse(array('code' => 1, 'msg' => '密码错误'));
+          if(isset($user->role) && array_key_exists(1, $user->role)){
+            if (hunter_password_verify($parms['password'], $user->password)) {
+              db_update('user')
+                ->fields(array(
+                  'accessed' => time(),
+                ))
+                ->condition('uid', $user->uid)
+                ->execute();
+              session()->set('admin', $user);
+              session()->set('curuser', $user);
+              return new JsonResponse(array('code' => 0, 'msg' => '登录成功'));
+            } else {
+              return new JsonResponse(array('code' => 1, 'msg' => '密码错误'));
+            }
+          }else {
+            return new JsonResponse(array('code' => 1, 'msg' => '无权限访问'));
           }
         }else{
-          return view('/admin/login.html');
+          return new JsonResponse(array('code' => 1, 'msg' => '用户不存在'));
         }
       }
       return view('/admin/login.html');
